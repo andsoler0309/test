@@ -1,0 +1,69 @@
+name: Release
+on:
+  push:
+    branches: [ dev ]
+jobs:
+  job1:
+    if: contains(github.event.commits[0].message, 'Release')
+    name: Create Release
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout de repositorio
+        uses: actions/checkout@v2
+      - name: Crear rama
+        run: |
+          git checkout -b release/${{ github.event.commits[0].message }}
+          git push -f -u origin release/${{ github.event.commits[0].message }}
+      - name: Mezcla release/${{ github.event.commits[0].message }} -> dev
+        uses: tukasz/direct-merge-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          source-branch: release/${{ github.event.commits[0].message }}
+          target-branch: dev
+      - name: Configuración de entorno de python
+        uses: actions/setup-python@v2
+        with:
+            python-version: '3.7'
+      - name: Instalación de librerías y dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Correr pruebas
+        id: correr-pruebas
+        run: python -m unittest -v tests/test_persona.py
+      - name: Validar resultado con errores
+        if: ${{ failure() }}
+        env:
+          MENSAJE_ERROR: Una o varias pruebas fallaron
+        run: echo "::set-output name=respuesta::${MENSAJE_ERROR}"
+      - name: Validar resultado sin errores
+        if: ${{ success() }}
+        env:
+          MENSAJE_EXITO: Todas las pruebas fueron exitosas
+        run: echo "::set-output name=respuesta::${MENSAJE_EXITO}"
+
+  automerge:
+    name: Automerge
+    needs: job1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
+      - name: automerge
+        uses: "pascalgn/automerge-action@4536e8847eb62fe2f0ee52c8fa92d17aa97f932f"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: ""
+      
