@@ -67,24 +67,18 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           MERGE_LABELS: ""
-      - name: Mezcla releases/${{ github.ref }} -> dev
+      - name: merge with dev
         uses: tukasz/direct-merge-action@master
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           source-branch: releases/${{ github.ref }}
           target-branch: dev
-      - name: Create pull request into main
-        uses: thomaseizinger/create-pull-request@1.0.0
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: merge with main
+        uses: tukasz/direct-merge-action@master
         with:
-          head: releases/${{ github.ref }}
-          base: main
-          title: Release ${{ github.ref }} into main
-          body: |
-              Hi!
-              This PR was created in response workflow running.
-              I've updated the version name and code commit: ${{ steps.make-commit.outputs.commit }}.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          source-branch: releases/${{ github.ref }}
+          target-branch: main
 
   deleteBranch:
     name: deleteBranch
