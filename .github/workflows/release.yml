@@ -68,16 +68,16 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           MERGE_LABELS: ""
       - name: Create pull request into main
-              uses: thomaseizinger/create-pull-request@1.0.0
-              with:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              head: Release ${{ github.ref }}
-              base: main
-              title: Release ${{ github.ref }} into main
-              body: |
-                  Hi!
-                  This PR was created in response workflow running.
-                  I've updated the version name and code commit: ${{ steps.make-commit.outputs.commit }}.
+          uses: thomaseizinger/create-pull-request@1.0.0
+          with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          head: Release ${{ github.ref }}
+          base: main
+          title: Release ${{ github.ref }} into main
+          body: |
+              Hi!
+              This PR was created in response workflow running.
+              I've updated the version name and code commit: ${{ steps.make-commit.outputs.commit }}.
 
   deleteBranch:
     name: deleteBranch
@@ -88,5 +88,5 @@ jobs:
         run: |
           git branch -D releases/${{ github.ref }}
           git push -d origin releases/${{ github.ref }}
-          
+
       
