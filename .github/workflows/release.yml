@@ -13,13 +13,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Crear rama
         run: |
-          git checkout -b release/${{ github.event.commits[0].message }}
-          git push -f -u origin release/${{ github.event.commits[0].message }}
-      - name: Mezcla release/${{ github.event.commits[0].message }} -> dev
+          git checkout -b releases/${{ github.ref }}
+          git push -f -u origin releases/${{ github.ref }}
+      - name: Mezcla releases/${{ github.ref }} -> dev
         uses: tukasz/direct-merge-action@master
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          source-branch: release/${{ github.event.commits[0].message }}
+          source-branch: releases/${{ github.ref }}
           target-branch: dev
       - name: Configuración de entorno de python
         uses: actions/setup-python@v2
