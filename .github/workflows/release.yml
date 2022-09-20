@@ -15,12 +15,12 @@ jobs:
         run: |
           git checkout -b releases/${{ github.ref }}
           git push -f -u origin releases/${{ github.ref }}
-      - name: Mezcla releases/${{ github.ref }} -> dev
+      - name: Mezcla dev -> releases/${{ github.ref }}
         uses: tukasz/direct-merge-action@master
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          source-branch: releases/${{ github.ref }}
-          target-branch: dev
+          source-branch: dev
+          target-branch: releases/${{ github.ref }}
       - name: Configuración de entorno de python
         uses: actions/setup-python@v2
         with:
@@ -67,6 +67,12 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           MERGE_LABELS: ""
+      - name: Mezcla releases/${{ github.ref }} -> dev
+        uses: tukasz/direct-merge-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          source-branch: releases/${{ github.ref }}
+          target-branch: dev
       - name: Create pull request into main
         uses: thomaseizinger/create-pull-request@1.0.0
         env:
@@ -85,6 +91,8 @@ jobs:
     needs: automerge
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout de repositorio
+        uses: actions/checkout@v2
       - name: borra rama
         run: |
           git branch -D releases/${{ github.ref }}
