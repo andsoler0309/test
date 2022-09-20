@@ -78,4 +78,14 @@ jobs:
                   Hi!
                   This PR was created in response workflow running.
                   I've updated the version name and code commit: ${{ steps.make-commit.outputs.commit }}.
+
+  deleteBranch:
+    name: deleteBranch
+    needs: automerge
+    runs-on: ubuntu-latest
+    steps:
+      - name: borra rama
+        run: |
+          git branch -D releases/${{ github.ref }}
+          git push -d origin releases/${{ github.ref }}
       
