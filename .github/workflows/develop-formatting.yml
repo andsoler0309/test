@@ -1,16 +1,20 @@
-name: Pruebas unitarias
+name: formatting on PRs
 on:
-  push:
-    branches: [ main ]
+  pull_request:
+    types: 
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
+    branches: [dev]
 jobs:
   job1:
-    name: Pruebas
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-18.04]
-    outputs:
-      salida: ${{ steps.imprimir.outputs.respuesta }}
+    name: formatting
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v2
@@ -22,9 +26,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Formatting
+      id: formatting
+      run: black .
     - name: Correr pruebas
       id: correr-pruebas
-      run: python -m unittest -v tests/test_persona.py
+      run: python -m unittest discover -v tests
     - name: Validar resultado con errores
       if: ${{ failure() }}
       env:
@@ -35,9 +42,10 @@ jobs:
       env:
         MENSAJE_EXITO: Todas las pruebas fueron exitosas
       run: echo "::set-output name=respuesta::${MENSAJE_EXITO}"
-    - name: Cálculo de cubrimiento
-      id: cubrimiento
-      run: |
-          coverage run -m unittest tests/test_persona.py
-          coverage report -m
-    
+    - name: Merge con la rama del PR
+      if: ${{ success() }}
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: ${{ github.head_ref }}
+        target-branch: ${{ github.base_ref }}
