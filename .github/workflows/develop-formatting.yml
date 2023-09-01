@@ -28,9 +28,7 @@ jobs:
         pip install -r requirements.txt
     - name: Formatting
       id: formatting
-      run: |
-        black .
-        isort .
+      run: black .
     - name: Correr pruebas
       id: correr-pruebas
       run: python -m unittest discover -v tests
