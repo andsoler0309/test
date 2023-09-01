@@ -42,10 +42,15 @@ jobs:
       env:
         MENSAJE_EXITO: Todas las pruebas fueron exitosas
       run: echo "::set-output name=respuesta::${MENSAJE_EXITO}"
-    - name: Merge con la rama del PR
-      if: ${{ success() }}
-      uses: tukasz/direct-merge-action@master
+    - name: Commit black formatting results
+      if: "${{ success() }}"
+      uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        source-branch: ${{ github.head_ref }}
-        target-branch: ${{ github.base_ref }}
+        commit_message: ":art: Format Python code with psf/black push"
+    # - name: Merge con la rama del PR
+    #   if: ${{ success() }}
+    #   uses: tukasz/direct-merge-action@master
+    #   with:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     source-branch: ${{ github.head_ref }}
+    #     target-branch: ${{ github.head_ref }}
