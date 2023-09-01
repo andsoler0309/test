@@ -48,4 +48,4 @@ jobs:
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         source-branch: ${{ github.head_ref }}
-        target-branch: ${{ github.base_ref }}
+        target-branch: ${{ github.head_ref }}
